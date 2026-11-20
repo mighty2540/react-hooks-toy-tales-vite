@@ -23,19 +23,75 @@ function App() {
     fetch("http://localhost:3001/toys", {
       method: "POST",
       headers: {
-        
-      }
+        "Content-Type": "application/json",
+
+      },
+      body: JSON.stringify(newToy),
     })
+    .then((response) => response.json())
+    .then((createdToy) => {
+      setToys((currentToys) => [...currentToys,createdToy])
+    });
+  }
+/*
+  function handleLikeToy(updatedToy) {
+    fetch(`http://localhost:3001/toys/${updatedToy.id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type" : "application/json"
+      },
+
+      body: JSON.stringify({
+        likes: updatedToy.likes + 1,
+      }),
+
+    })
+    .then((response) => response.json())
+    .then((updatedToy) => {
+      setToys(
+        toys.map((toy) => {
+          toy.id === updatedToy.id ? updatedToy : toy
+        })
+      );
+    });
+  }*/
+
+    function handleLikeToy(updatedToy) {
+      fetch(`http://localhost:3001/toys/${updatedToy.id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type" : "application/json"
+        },
+        body: JSON.stringify({
+          likes: updatedToy.likes + 1,
+        }),
+      })
+      .then((response) => response.json())
+      .then((updatedToy) => {
+        setToys((currentToys) => 
+          currentToys.map((toy) =>
+          toy.id === updatedToy.id ? updatedToy : toy)
+        )
+      })
+    }
+
+  function handleDeleteToy(id) {
+    fetch(`http://localhost:3001/toys/${id}`, {
+      method: "DELETE",
+    }).then(() => {
+      setToys((currentToys) => 
+      currentToys.filter((toy) => toy.id !== id))
+    });
   }
 
   return (
     <>
       <Header />
-      {showForm ? <ToyForm /> : null}
+      {showForm ? <ToyForm  onAddToy ={handleAddToy} /> : null}
       <div className="buttonContainer">
         <button onClick={handleClick}>Add a Toy</button>
       </div>
-      <ToyContainer toys={toys}/>
+      <ToyContainer toys={toys} onLikeToy={handleLikeToy} onDeleteToy={handleDeleteToy}  />
     </>
   );
 }
